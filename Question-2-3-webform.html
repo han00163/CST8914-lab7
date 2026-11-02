@@ -73,15 +73,13 @@
       (function () {
         var validateInput;
       
+        <!-- This-->
         $.urlParam = function (name) {
-          var results;
-          results = new RegExp('[?&]' + name + '=([^&#]*)').exec(window.location.href);
-      
-          if (results === null) {
-            return null;
-          } else {
-            return decodeURI(results[1]) || null;
-          }
+          var value = new URLSearchParams(window.location.search).get(name);
+
+          return value === null || value.trim() === ""
+          ? null
+          : value.trim();
         };
       
         validateInput = function validateInput(input, message) {
@@ -90,7 +88,10 @@
       
           if ((value = $.urlParam(input)) === null) {
             if ($('fieldset.errors').length === 0) {
-              $('form').prepend('<fieldset class="errors"><legend>Errors</legend><ul></ul></fieldset>');
+              $('form').prepend('<fieldset class="errors" tabindex="-1" ' +
+           'aria-labelledby="errors-heading">' +
+  '<legend id="errors-heading">Errors: please correct the following fields</legend>' +
+  '<ul></ul></fieldset>');
             }
       
             $referencedElement = null;
@@ -106,7 +107,7 @@
               $referencedElement = $input;
             }
       // R.G. hint: fix next line ;)
-            $error = $('<a>' + message + '</a>');
+            $error = $('<a>').attr('href', '#' + $referencedElement.attr('id')).attr('id', input + '_description').addClass('error').text(message);;
             $error.click(function (e) {
               // If we rely on the link's href pointing to the input's ID, it doesn't trigger forms mode in screen readers
               $referencedElement.focus();
@@ -139,8 +140,11 @@
             validateInput('gender', 'Please tell us your gender!');
             validateInput('accept_agbs', 'You must accept our terms and conditions!');
       
-            if ($('.error').length === 0) {
-              return alert('All inputs are valid.');
+            <!-- Move focus to the errors fieldset if there are any errors, otherwise show success message "All inputs are valid."-->
+            if ($('.error').length > 0) {
+              $('fieldset.errors').focus();
+            } else {
+              alert('All inputs are valid.');
             }
           }
         });
