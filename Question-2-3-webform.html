@@ -86,12 +86,10 @@
           var $elementToDescribe, $error, $errorContainer, $fieldset, $input, $referencedElement, value;
           $input = $('[name="' + input + '"]');
       
+          <!-- Validate the input, Make the error summary focusable, but exclude it from naormal Tab navigation -->
           if ((value = $.urlParam(input)) === null) {
             if ($('fieldset.errors').length === 0) {
-              $('form').prepend('<fieldset class="errors" tabindex="-1" ' +
-           'aria-labelledby="errors-heading">' +
-  '<legend id="errors-heading">Errors: please correct the following fields</legend>' +
-  '<ul></ul></fieldset>');
+              $('form').prepend('<fieldset class="errors" tabindex="-1"><legend>Errors</legend><ul></ul></fieldset>');            
             }
       
             $referencedElement = null;
